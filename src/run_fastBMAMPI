@@ -1,0 +1,2 @@
+#!/bin/sh
+mpiexec -np 4 fastBMA -t -o 4 -m ./data/timeSeries.tab --edgeMin 0.5 --priorsMatrix ./data/reg.prob.tab --noPrune --oddsRatio 100 --time
