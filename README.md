@@ -11,8 +11,15 @@ fastBMA is available as a standalone function or as part of the networkBMA R pac
 
 ##Installation#
 ###Compilation from source
-The compilation is relatively straightforward for Linux and MacOS. It probably will work with MinGW by changing the Makefile to point to the correct headers for the boost and MPI libraries (if desired). However, it is MUCH easier to use the Docker repositories with very little overhead especially for Linux. The R package is 
-Clone the repository or download the zip file and extract the contents. There are two Makefiles, one for a typical Fedora installation and one for a Ubuntu installation. The openBLAS headers are included but openBLAS itself must be installed
+
+The compilation is relatively straightforward for Linux and MacOS and should work with MinGW with some minor modifications to the Makefile. However, it is much easier to use the Docker container especailly if you want to set up a distributed cloud network to run fastBMA.  Even simpler is the R package. However the R version lacks some minor features and does not use OpenBLAS or MPI.
+
+fastBMA uses [OpenBLAS](http://www.openblas.net/) and [mpich]/boost-mpi. These need to be
+
+. [OpenBLAS](http://www.openblas.net/) needs to be installed as does OpenMPI. It probably will work with MinGW by changing the Makefile to point to the correct headers for the boost and MPI libraries (if desired). 
+
+However, it is **MUCH** easier to use the Docker repositories with very little overhead especially for Linux. The R package is 
+Clone the repository or download the zip file and extract the contents. There are two Makefiles, one for a typical Fedora installation and one for a Ubuntu installation. The openBLAS headers are included but openBLAS itself must be installed. 
 
 ##Sample usage#
 
