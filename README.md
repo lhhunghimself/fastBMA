@@ -10,15 +10,17 @@ We evaluated the performance of fastBMA on synthetic data and real genome-wide y
 fastBMA is available as a standalone function or as part of the networkBMA R package. The binaries are also distributed in portable software containers, for reproducible deployment on Linux/Mac/Windows machines, cloud instances and clusters. The source code is open source (M.I.T. license). Downloads are available through a GitHub and Docker Hub repository. 
 
 ##Installation#
-###Compilation from source
+###Compilation from source#
 
 The compilation is relatively straightforward for Linux and MacOS and should work with MinGW with some minor modifications to the Makefile. However, it is much easier to use the Docker container especailly if you want to set up a distributed cloud network to run fastBMA.  Even simpler is the R package. However the R version lacks some minor features and does not use OpenBLAS or MPI.
 
-fastBMA uses [OpenBLAS](http://www.openblas.net/) and [mpich]/boost-mpi. These need to be
+fastBMA uses [OpenBLAS](http://www.openblas.net/) and [mpich](https://www.mpich.org/)/boost-mpi(http://www.boost.org/doc/libs/1_60_0/doc/html/mpi.html). mpich2 can be installed as a package using apt-get/yum/dnf/brew. However, OpenBLAS must be compiled from source, as does boost if MPI is to be used. Compilation instructions for boost/boost-mpi can be found [here](http://kratos-wiki.cimne.upc.edu/index.php/How_to_compile_the_Boost_if_you_want_to_use_MPI)
 
-Clone the repository or download the zip file and extract the contents. There are two Makefiles, one for a typical Fedora installation and one for a Ubuntu installation. The openBLAS headers are included but openBLAS itself must be installed. 
+Once the necessary libraries are installed, clone the repository or download the zip file and extract the contents and change into the CD. There are two Makefiles, one for a typical Fedora installation and one for a Ubuntu installation. The non-MPI installation has also been tested on MacOS-Yosemite and it probably will compile under MinGW on Windows with minor changes to the Makefile.
 
 ##Sample usage#
+
+
 
 ##Data File Formats#
 
