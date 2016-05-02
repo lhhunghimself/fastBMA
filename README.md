@@ -16,9 +16,6 @@ The compilation is relatively straightforward for Linux and MacOS and should wor
 
 fastBMA uses [OpenBLAS](http://www.openblas.net/) and [mpich]/boost-mpi. These need to be
 
-. [OpenBLAS](http://www.openblas.net/) needs to be installed as does OpenMPI. It probably will work with MinGW by changing the Makefile to point to the correct headers for the boost and MPI libraries (if desired). 
-
-However, it is **MUCH** easier to use the Docker repositories with very little overhead especially for Linux. The R package is 
 Clone the repository or download the zip file and extract the contents. There are two Makefiles, one for a typical Fedora installation and one for a Ubuntu installation. The openBLAS headers are included but openBLAS itself must be installed. 
 
 ##Sample usage#
