@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <string.h>
 #include <set>
 #include <map>
 #include <limits>
@@ -12,6 +13,7 @@
 #include <vector>
 #include <algorithm>
 #include <queue>
+#include <boost/math/special_functions/fpclassify.hpp>
 #include <boost/math/tools/minima.hpp>
 #include <time.h>
 #include <sys/time.h>
@@ -25,14 +27,15 @@
 #include <boost/serialization/string.hpp>
 namespace mpi = boost::mpi;
 #endif
-#include "OpenBLAS/cblas.h" //this must go AFTER and not before the boost mpi headers for some reason
+#include <cblas.h>
+#include <lapacke.h>
+//this must go AFTER and not before the boost mpi headers for some reason
 //include the following because macs don't have clockgettime
 #ifdef MAC_OS
 #include <mach/clock.h>
 #include <mach/mach.h>
 #endif
 #define UNIFORM_PRIOR 2.76/6000.0
-#define EPSILONFACTOR 1e-6 //will be added to uniform prior if correlation matrix is given to casue the variables to be ranked
 #define MAXPRIOR 0.9999999 //needed for stability
 #define NFILTERS 64
 using namespace std;
@@ -45,10 +48,6 @@ double get_elapsed_time(const struct timespec *start_time,const struct timespec 
 bool isTimedOut(struct timespec *regStart,float timeout);
 
 //globals
-
-//unsigned int total_checks=0;
-//unsigned int total_collisions=0;
-//timers
 
 bool gtime=0;
 struct timespec start_time;
@@ -820,8 +819,7 @@ template <class T> class ModelSet{
 		modelIndices=rhs.modelIndices;
 		logprior=rhs.logprior; 	
 	}
-	//bool operator<(const ModelSet& b) const { return (bic < b.bic) && ! (modelIndices == b.modelIndices); }
- //bool operator>(const ModelSet& b) const { return (bic > b.bic) && ! (modelIndices == b.modelIndices); }
+
  bool operator<(const ModelSet& b) const { return (bic < b.bic) && ! (modelIndices == b.modelIndices); }
  bool operator>(const ModelSet& b) const { return (bic > b.bic) && ! (modelIndices == b.modelIndices); }
  bool operator>=(const ModelSet& b) const { return !(*this < b); }
@@ -1014,7 +1012,19 @@ class EdgeList{
 			}	
 		}
 		return(nonSelfList);
+	}
+ unordered_set<string> prunedEdges(float edgeMin,vector<string> headings,bool selfie,float pruneEdgeMin){
+		unordered_set<string> prunedList; //std::unordered_set does not support unordered_set<pair<string,string>> without defining own hashfunction or using boost -> simpler just to concatenate strings with a separator
+		for(int i=0;i<nNodes;i++){
+		 for (int j=0;j<nParents[i];j++){
+			 if((selfie && parents[i][j] == i) || -edgeWeights[i][j] > pruneEdgeMin){
+     prunedList.insert(headings[parents[i][j]]+string(":")+headings[i]);
+			 }
+			} 
+		}
+		return(prunedList);		
 	}	
+		
 	void printEdges(float edgeMin,vector<string> headings,bool selfie,bool keepNegative,float pruneEdgeMin){
 		for(int i=0;i<nNodes;i++){
 		 for (int j=0;j<nParents[i];j++){
@@ -1514,7 +1524,8 @@ template <class T> T chooseBestModels(double g,T *ATA,int nVars,int nRows,int nC
 			 	  tempmodelIndices.insertElement(i);
 						 T rv=getR2_up(tempmodelIndices,ATA,nVars+1,ATb,btb,Rplus,p);
 						 //check if rv is reasonable - otherwise use the full method
-						 if(isnanf(rv) || isinff(rv) || rv <0 || rv > sst){
+						 if(!boost::math::isfinite(rv) || rv <0 || rv > sst){
+						 //if(isnanf(rv) || isinff(rv) || rv <0 || rv > sst){
 						  rv=getR2_full(tempmodelIndices,ATA,nVars+1,ATb,btb,Rarray,p+1);
 						  denovo=1;
 							} 
@@ -1571,7 +1582,8 @@ template <class T> T chooseBestModels(double g,T *ATA,int nVars,int nRows,int nC
        //copy matrix and delete jth colum
        it->R.tr_to_sq_delj(Rminus,p+1,j);
 						 T rv=getR2_down(p+1,modelIndices,ATb,btb,Rminus,p+1,j);
-						 if(isnanf(rv) || isinff(rv) || rv <0 || rv > sst){
+						 if(!boost::math::isfinite(rv) || rv <0 || rv > sst){
+						 //if(isnanf(rv) || isinff(rv) || rv <0 || rv > sst){
 			     rv=getR2_full(tempmodelIndices,ATA,nVars+1,ATb,btb,Rarray,p+1);
 						  denovo=1;
 							} 
@@ -2026,6 +2038,21 @@ EdgeList* readEdgeListFile(string edgeListFile, vector<string> &headers){
 		}
 		return(edgeList);	
 	}
+void pruneEdgeListFile(string edgeListFile, vector<string> &headers,unordered_set <string> &pruneList){
+		ifstream inFile(edgeListFile,ios::in);	
+		if (inFile.is_open()){
+		 string token,line;
+   while ( getline (inFile,line,'\n')){
+				string node1,node2;
+			 std::istringstream iss(line);
+			 if (!getline(iss, node1, '\t'))continue;
+ 			if (!getline(iss, node2, '\t'))continue;
+    if(!pruneList.count(node1+string(":")+node2)) cout<< line <<'\n'; //put back the \n - this works even with windows \r\n
+		 }		 
+		 inFile.close();				
+	 }
+}	 
+	
 template <class T> void readPriorsList(string priorsListFile,vector <string> names, T **priors, T uniform_prob){
  //returns priors
  //format is each gene is in the same order as the gene order of the matrix
@@ -2179,15 +2206,7 @@ template <class T> T getR2_up(ModelIndices &modelIndices,T* ATA,int ATAldr, T* A
 
  //number of columns have increased by 1...
  trsvutr(nCols+1,R,Rldr,w);
- rho=dot(nCols+1,w,w);
- /*
- if(isinff(rho) || isnanf(rho)){
-  //throw the variable away - it is either near zero or an a multiple of another variable
-  delete[] w;
-  return(btb);
-	}
- */
-	
+ rho=dot(nCols+1,w,w);	
  delete[] w;
  return(btb-rho);
 }
@@ -2215,8 +2234,7 @@ template <class T> T getR2_down(int nRows,ModelIndices &modelIndices,T* ATb,cons
 	//back substitute to get residuals
  trsvutr(nCols,R,Rldr,v);
  rho=dot(nCols,v,v);
-  if(isinff(rho) || isnanf(rho)){
-  //throw the variable away - it is either near zero or an a multiple of another variable
+ if(!boost::math::isfinite(rho)){
   return(btb);
 	}
  return(btb-rho);  

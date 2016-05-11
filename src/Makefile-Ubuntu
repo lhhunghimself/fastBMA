@@ -42,7 +42,7 @@ ifdef DEBUG
 endif
 FFLAGS=-fimplicit-none
 
-CFLAGS= -I ./ -I ./tclap-1.2.1/include $(MAC_INCLUDES) $(MPI_INCLUDES) $(OPT_FLAGS) -std=c++11 -Wno-write-strings -fexpensive-optimizations -fopenmp -ffast-math -finline-functions -frerun-loop-opt -static $(HDRS) $(DEFINES) $(OS)
+CFLAGS= -I ./ -I ./include -I ./tclap-1.2.1/include $(MAC_INCLUDES) $(MPI_INCLUDES) $(OPT_FLAGS) -std=c++11 -Wno-write-strings -fexpensive-optimizations -fopenmp -ffast-math -finline-functions -frerun-loop-opt -static $(HDRS) $(DEFINES) $(OS)
 LIBS= $(LIBDIRS) $(MYLIBS) $(LOPENMP) $(LMPI)
 
 # object files needed

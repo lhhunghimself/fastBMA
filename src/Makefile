@@ -1,10 +1,10 @@
 CXX=g++
 CC=gcc
 LD=$(CXX)
-LFLAGS=-L /usr/local/lib -L /opt/OpenBLAS/lib
+LFLAGS=-L /usr/lib64/mpich/lib -L /usr/local/lib
 FF=gfortran
 MYLIBS=-lm -lc -lboost_math_tr1 -lgcc -lopenblas -lgfortran -lrt
-MPI_INCLUDES=-I /usr/include/boost -I /usr/lib/mpich/include
+MPI_INCLUDES= -I /usr/include/mpich-x86_64 -I /usr/lib/mpich/include
 #find the type of system - specifically to fix MacOS issues
 UNAME := $(shell uname)
 CLANG := $(shell gcc -v 2>&1 | grep clang )
@@ -42,7 +42,7 @@ ifdef DEBUG
 endif
 FFLAGS=-fimplicit-none
 
-CFLAGS= -I ./ -I ./tclap-1.2.1/include $(MAC_INCLUDES) $(MPI_INCLUDES) $(OPT_FLAGS) -std=c++11 -Wno-write-strings -fexpensive-optimizations -fopenmp -ffast-math -finline-functions -frerun-loop-opt -static $(HDRS) $(DEFINES) $(OS)
+CFLAGS= -I ./ -I ./include -I ./tclap-1.2.1/include $(MAC_INCLUDES) $(MPI_INCLUDES) $(OPT_FLAGS) -std=c++11 -Wno-write-strings -fexpensive-optimizations -fopenmp -ffast-math -finline-functions -frerun-loop-opt -static $(HDRS) $(DEFINES) $(OS)
 LIBS= $(LIBDIRS) $(MYLIBS) $(LOPENMP) $(LMPI)
 
 # object files needed

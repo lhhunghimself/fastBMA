@@ -227,7 +227,8 @@ int main(int argc, char *argv[]){
 	}
 	if(noPrune){
 		pruneFilterMin=edgeMin;
-	}	
+	}
+
  const float twoLogOR=2.0 * log(oddsRatio);
 	if(matrixFile != ""){
 		if(singlePrecision){
@@ -245,14 +246,14 @@ int main(int argc, char *argv[]){
 	 vector<string> headers;
 		//edgeList
 		EdgeList *edgeList=readEdgeListFile(edgeListFile,headers); 
+		EdgeList nonSelfList=edgeList->nonSelfList();
 		if(gtime){
 		 current_utc_time(&start_time);
-  } 	 
-		EdgeList nonSelfList=edgeList->nonSelfList();
-		if(!pruneFilterMin)pruneFilterMin=edgeMin/4.0;
+  }
+  if(!pruneFilterMin)pruneFilterMin=edgeMin/4.0;
   nonSelfList.prune_edges(pruneFilterMin,edgeTol);
-  if(selfie)edgeList->printSelfEdges(edgeMin,headers,showPrune,0);
-  nonSelfList.printEdges(edgeMin,headers,selfie,showPrune,pruneEdgeMin);
+  unordered_set<string> prunedList = nonSelfList.prunedEdges(edgeMin,headers,0,pruneEdgeMin);
+  pruneEdgeListFile(edgeListFile,headers,prunedList);
 		if(gtime){
 		 current_utc_time(&end_time);
    cerr << "elapsed time: "<< get_elapsed_time(&start_time, &end_time) << " seconds"<<endl;

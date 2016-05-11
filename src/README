@@ -1,9 +1,0 @@
-Need to install OpenBLAS libraries. The headers are included. 
-
-To generate the binary
-
-make clean; make; 
-
-Basic usage is given by fastBMA --help
-
-Hong Hung 1/1/15
