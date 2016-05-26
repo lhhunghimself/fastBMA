@@ -54,3 +54,13 @@ There are 4 major algorithmic improvements that increase the speed, scalability 
 These are described in detail in an upcoming paper.
 
 ##Benchmarks#
+
+###fastBMA is faster and more accurate on synthetic and experimental gene expression data
+<img src="https://cloud.githubusercontent.com/assets/10456425/15581992/aa3b8930-2323-11e6-85e6-a37d16d82be4.png" width="90%"></img>
+
+Graphs of the overall accuracy of networks as a function of running time on the DREAM4 simulated and yeast time series data. The area under the receiver operating character curve (AUROC) and area under the precision recall curve (AUPR) of networks inferred from the DREAM4 dataset by fastBMA (no post-processing), ScanBMA and LASSO are plotted against the running times. The different points represent fastBMA and ScanBMA with increasingly wider searches as determined by the odds ratio (OR) parameter (OR=100,1000,10000). LASSO does not have an equivalent parameter and was run with the default settings. For the yeast tests, prior probabilities of regulatory relationships (informative priors) were obtained using external data sources as described in Lo et al. For all methods not using priors (including LASSO) variables were ordered by their absolute correlation to the response variable. For the ScanBMA yeast tests the search space was restricted to the 100 variables with the highest prior probabilities. fastBMA was run with a search space of 100 variables using 1 core and all 3556 variables using 8 cores, with and without the Lo et al. prior probabilities.  All tests were conducted on an A10 Microsoft Azure cloud instance, which is an Intel Xeon CPU with 8 cores and 56 GB of RAM.
+
+###fastBMA and fastBMA post-processing increases accuracy of highest confidence regulatory predictions
+<img src="https://cloud.githubusercontent.com/assets/10456425/15582132/4b9cd202-2324-11e6-86b3-a0dae6908bf7.png" width="90%"></img> 
+
+The precision-recall curves were plotted for the networks inferred from the yeast (3556 variables) time series expression data using LASSO, LASSO+ fastBMA post-processing, fastBMA and fastBMA with informative prior. Precision-recall curves for post-processed fastBMA are almost identical to curves for un-processed fastBMA and are not plotted. In the upper left, the precision-recall curves for fastBMA are above that for LASSO, indicating the increased accuracy of fastBMA for predictions assigned higher confidences. Post-processing by transitive reduction also increases the accuracy of high confidence predictions for LASSO.
