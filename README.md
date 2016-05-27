@@ -59,8 +59,31 @@ For time series there is also the option of using residuals with the --useResidu
 fastBMA can also be used with non-time series data. This is the same format as the timeSeries data with the time field omitted. In this case each variable is fitted to the values of all the other variables.
 
 ###Priors formats
-There are two possible formats for this.
+Priors can be read as a matrix (flag -p or --priorsMatrix) or as a list (flag --priorsList. Matrix format has a mandatory header row with the N tab delimited variable names followed by N rows with the variable Name and columns with the prior probability of that variable being regulated by variable 1 to variable N. For example
+````
+Gene1 Gene2 Gene3
+Gene1 1.0 0.5 0.4
+Gene2 0.3 0.8 0.6
+Gene3 0.1 0.2 0.7
+````
+The equivalent list format is regulatingGeneName regulatedGeneName PriorProbability. For example
+````
+Gene1 Gene1 1.0
+Gene2 Gene1 0.5
+Gene3 Gene1 0.4
+Gene1 Gene1 0.3
+Gene2 Gene1 0.8
+Gene3 Gene1 0.6
+Gene1 Gene1 0.1
+Gene2 Gene1 0.2
+Gene3 Gene1 0.7
+````
 ###Edge lists format
+fastBMA can be used to postprocess networks inferred by other methods to remove edges due to indirect interactions. This is done by using the -e or --edgeList flag to read in an edge list. The format of the edgelist is the similar as for a priorsList i.e. on each tab delimited line line 
+````
+regulatingGeneName regulatedGeneName weight
+````
+Weights must be between 0 and 1.
 
 ##Use with MPI#
 MPI jobs are run using mpiexec or mpirun. Documentation on running MPI apps can be found [here](https://www.mpich.org/documentation/guides/)
