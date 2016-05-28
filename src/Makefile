@@ -58,8 +58,9 @@ main.o: main.cpp
 MurmurHash3.o: MurmurHash3.cpp
 	$(CXX) $(CFLAGS) -c MurmurHash3.cpp	
 clean:
-	rm *.o
-	rm core.* 
+	-@rm -rf *.o 2>/dev/null || true
+	-@rm -rf core.* 2>/dev/null || true
+	-@rm -rf 'fastBMA' 2>/dev/null || true
 # all together now...
 default: fastBMA
 print-% : ; @echo $* = $($*)
