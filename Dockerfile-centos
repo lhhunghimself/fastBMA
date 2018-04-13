@@ -1,0 +1,25 @@
+FROM centos:7.2.1511
+MAINTAINER lhhung
+RUN yum -y install gcc-gfortran gcc-c++ libmpc-devel mpich-3.2-devel git wget bzip2
+RUN yum install -y make 
+RUN git clone -q --branch=master git://github.com/xianyi/OpenBLAS.git && cd OpenBLAS \
+    && make DYNAMIC_ARCH=1 NO_AFFINITY=1 NUM_THREADS=32 \
+    && make install
+RUN ldconfig
+RUN cd /home && wget http://downloads.sourceforge.net/project/boost/boost/1.66.0/boost_1_66_0.tar.bz2 \
+  && tar xfj boost_1_66_0.tar.bz2 \
+  && rm boost_1_66_0.tar.bz2 \
+  && cd boost_1_66_0 \
+  && /bin/bash -c './bootstrap.sh' && echo 'using mpi ;' >> project-config.jam\
+  && /bin/bash -c './b2 -j8 -target=shared,static; exit 0;' && /bin/bash -c './b2 install; exit 0;'
+RUN cd /home && rm -rf boost_1_66_0
+COPY src /src
+WORKDIR /src
+RUN make clean && cp Makefile-centos Makefile && make MPI=1 && cp fastBMA /bin/fastBMA 
+WORKDIR /root
+ENV PATH $PATH:/usr/lib64/mpich-3.2/bin/
+ENV LD_LIBRARY_PATH=/opt/OpenBLAS/lib:/usr/local/lib:$LD_LIBRARY_PATH
+
+
+
+ 
