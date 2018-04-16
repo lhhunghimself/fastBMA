@@ -8,4 +8,3 @@ WORKDIR /src
 RUN apt-get install -y libmpich-dev g++ && make clean && cp Makefile-Ubuntu Makefile && make MPI=1 && cp fastBMA /bin/fastBMA && apt-get remove -y g++ nano
 WORKDIR /
 ENV LD_LIBRARY_PATH /usr/local/lib:$LD_LIBRARY_PATH
- 
