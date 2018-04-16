@@ -2062,27 +2062,36 @@ template <class T> void readPriorsList(string priorsListFile,vector <string> nam
   for(int i=0;i<names.size();i++){
 			namesMap[names[i]]=i;
 		}
-  for (int i=0;i<names.size();i++)
+  for (int i=0;i<names.size()*names.size();i++)
    priors[0][i]=uniform_prob;
-  for (int i=1;i<names.size();i++)
-   memmove(priors[i],priors[0],sizeof(T)*names.size());  
 		ifstream inFile(priorsListFile,ios::in);	;
 		if (inFile.is_open()){
    string line;    
 		 float value;
 		 char parent[1024],child[1024];		 
    while ( getline (inFile,line,'\n')){
-			 sscanf(line.c_str(),"%s\t%s\t%f",&parent, &child, &value);    
+			 sscanf(line.c_str(),"%s\t%s\t%f",&parent, &child, &value);
+			 //remove any quotes
 			 //expects first name to regulate second name
-			 string parentStr(parent); 
+			 string parentStr(parent);
+			 string childStr(child);
+			 parentStr.erase(remove( parentStr.begin(), parentStr.end(), '\"' ),parentStr.end());
+			 childStr.erase(remove( childStr.begin(), childStr.end(), '\"' ),childStr.end());
 			 auto parentit = namesMap.find(parentStr);
 			 if(parentit != namesMap.end()){
-				 string childStr(child);
 					auto childit=namesMap.find(childStr);
 			  if(childit != namesMap.end()){
 						priors[childit->second][parentit->second]=(value > MAXPRIOR)? MAXPRIOR: value;
 				 }
+				 else{
+						fprintf(stderr,"target gene %s not found -no prior assigned\n",child);
+						exit(0);
+					}	
 				}
+				else{
+					fprintf(stderr,"regulator gene %s not found -no prior assigned\n",parent);
+					exit(0);
+				}	
 			}		 
 		 inFile.close();				
 	 }

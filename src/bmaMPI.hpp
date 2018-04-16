@@ -66,7 +66,7 @@ template <class T> void findEdges(string evalSubsetString,string matrixFile,stri
 		rProbs=new T*[nGenes];
 		rProbs[0]=new T[nGenes*nGenes];
 		for (int i=1;i<nGenes;i++){
-			rProbs[i]=rProbs[i]+nGenes;
+			rProbs[i-1]=rProbs[i]+nGenes;
 		}
 		if(world.rank()==0)readPriorsList(priorsListFile,headers,rProbs,uniform_prob);
 		broadcast(world,rProbs[0],nGenes*nGenes,0);
